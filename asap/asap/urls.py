@@ -17,7 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-urlpatterns = [
+urlpatterns = (
+    # API
+    path('v1/student/', include('student.urls')),
+    path('v1/public/', include('public.urls')),
+
+    # VIEWS - TEMPLATES
     path('admin/', admin.site.urls),
-    path('students/', include('student.urls'))
-]
+    path('public/', include('public.views_urls'))
+)
