@@ -1,0 +1,10 @@
+{
+  "name": "Student name",
+  "lastname": "Lastname",
+  "email": "student@mail.com",
+  "password": "123456",
+  "major": "CS",
+  "active": true,
+  "age": 20,
+  "semester": 4
+}

@@ -3,10 +3,9 @@ from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
 
 class Student (models.Model):
-    userKey = models.ForeignKey(
+    userKey = models.OneToOneField(
         User,
-        default=None,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     active = models.BooleanField(
         default=False
@@ -17,7 +16,7 @@ class Student (models.Model):
             MinValueValidator(limit_value=0)
         ]
     )
-    semesters = models.IntegerField(
+    semester = models.IntegerField(
         default=1,
         validators=[
             MinValueValidator(limit_value=1)
