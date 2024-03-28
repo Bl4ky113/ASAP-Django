@@ -3,14 +3,17 @@ import json
 import logging
 
 from django.views.generic.base import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.forms.models import model_to_dict
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import permission_required
 
 from django.contrib.auth.models import User
 from .models import Student
 
 from django.db.utils import IntegrityError
+from django.core.exceptions import PermissionDenied
 
 log_instance = logging.getLogger(__name__)
 
@@ -18,7 +21,8 @@ class StudentView (View):
     http_method_names = ['POST']
 
     @csrf_exempt
-    def post (request):
+    @permission_required(('asap.create_user',), raise_exception=True)
+    def post (request, *args, **kwargs):
         try:
             if (request.method != 'POST'):
                 return JsonResponse(
@@ -38,14 +42,17 @@ class StudentView (View):
                     student_data['email'],
                     student_data['password'],
                     first_name=student_data['name'],
-                    last_name=student_data['lastname']
+                    last_name=student_data['lastname'],
                 )
+
+                user.groups.set(["student"])
+
             except IntegrityError as err:
                 log_instance.critical(str(type(err)) + ' ; ' + str(err))
                 return JsonResponse(
                     {
                         "error": "ERROR CREATING USER: " + str(err),
-                        "code": 200-2
+                        "code": 200-3
                     },
                     status=400
                 )
@@ -67,7 +74,7 @@ class StudentView (View):
                return JsonResponse(
                    {
                        "error": "ERROR CREATING STUDENT: " + str(err),
-                       "code": 200-3
+                       "code": 200-4
                    },
                    status=400
                )
