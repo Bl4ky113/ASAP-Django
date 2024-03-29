@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{% static 'css/styles_base.css' %}">
+  <link rel="stylesheet" href="{% static 'login/styles.css' %}">
+  <title>Login View</title>
+</head>
+<body>
+  <div class="wrapper">
+    <main 
+      class="main {% if user.is_authenticated %}main--logged-user{% endif %}">
+      <h1 class="main__title">
+        User Login View
+      </h1>
+      <section class="section">
+        <p class="section__title">
+          Login Form
+        </p>
+        <form
+          action="{% url 'login_view' %}"
+          method="post"
+          class="form">
+          {% csrf_token %}
+          <input 
+            class="input"
+            type="text"
+            name="username"
+            placeholder="Username">
+          <input 
+            class="input"
+            type="password"
+            name="password"
+            placeholder="Password">
+          <input
+            class="input"
+            type="submit" 
+            value="Login">
+        </form>
+      </section>
+      {% if user.is_authenticated %}
+        <section class="section">
+          <p class="section__title">
+            User Logged in
+          </p>
+          <p class="section__subtitle">
+            Name: 
+          </p>
+          <p class="section__text">
+            {{ user.first_name }} {{ user.last_name }}
+          </p>
+          <p class="section__subtitle">
+            Email:
+          </p>
+          <p class="section__text">
+            {{ user.email }}
+          </p>
+        </section>
+      {% endif %}
+    </main>
+  </div>
+</body>
+</html>

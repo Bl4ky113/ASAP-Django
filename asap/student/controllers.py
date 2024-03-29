@@ -1,6 +1,6 @@
 
 import json
-import logging
+import logging_handler
 
 from django.views.generic.base import View
 from django.http import JsonResponse, HttpResponseForbidden
@@ -15,8 +15,6 @@ from .models import Student
 from django.db.utils import IntegrityError
 from django.core.exceptions import PermissionDenied
 
-log_instance = logging.getLogger(__name__)
-
 class StudentView (View):
     http_method_names = ['POST']
 
@@ -24,15 +22,6 @@ class StudentView (View):
     @permission_required(('asap.create_user',), raise_exception=True)
     def post (request, *args, **kwargs):
         try:
-            if (request.method != 'POST'):
-                return JsonResponse(
-                    {
-                        "error": "INVALID METHOD",
-                        "code": 200-2
-                    },
-                    status=405
-                )
-            
             decoded_body = request.body.decode('utf-8')
             student_data = json.loads(decoded_body)
 
@@ -93,10 +82,11 @@ class StudentView (View):
             )
 
         except Exception as err:
-            log_instance.critical(str(type(err)) + ' : ' + str(err))
+            logging_handler.critical_error(__name__, err)
+
             return JsonResponse(
                 {
-                    "error": str(err),
+                    "error": "INTERNAL SERVER ERROR",
                     "code": 200-1
                 },
                 status=500

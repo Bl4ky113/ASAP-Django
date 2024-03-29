@@ -5,5 +5,5 @@ from . import controllers
 
 urlpatterns = (
     path('health_check', controllers.health_check, name='healthcheck'),
-    path('login', controllers.LoginView, name='login user')
+    path('login', controllers.LoginController.as_view(), name='login')
 )

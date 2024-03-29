@@ -1,14 +1,12 @@
 
 import json
-import logging
+import logging_handler
 
 from django.http import JsonResponse
 from django.views.generic.base import View
 
 from django.contrib.auth import authenticate
-from django.contrib.sessions.models import Session
-
-log_instance = logging.getLogger(__name__)
+from django.contrib.sessions.backends.db import SessionStore
 
 def health_check (request):
     return JsonResponse(
@@ -16,21 +14,11 @@ def health_check (request):
         status=200
     )
 
-class LoginView (View):
+class LoginController (View):
     http_method_names = ('post',)
 
-    def post (request, *arg, **kwargs):
+    def post (self, request, *args, **kwargs):
         try:
-            if (request.method != 'POST'):
-                print(request.method)
-                return JsonResponse(
-                    {
-                        "error": "INVALID METHOD",
-                        "code": 300-2  
-                    },
-                    status=405
-                )
-
             decoded_body = request.body.decode('utf-8')
             user_login_data = json.loads(decoded_body)
 
@@ -40,10 +28,16 @@ class LoginView (View):
             )
 
             user_hash = user.get_session_auth_hash()
+            
+            print(user)
+            print(type(user))
+            print(dir(user))
 
-            print(dir(Session.objects.get(session_key=user_hash)))
-            # session = Session.objects.get(session_key=user_hash)
-            # print(dir(session))
+            session = SessionStore(session_key=user_hash)
+
+            print(session)
+            print(type(session))
+            print(dir(session))
 
             return JsonResponse(
                 {
@@ -53,10 +47,11 @@ class LoginView (View):
             )
 
         except Exception as err:
-            log_instance.critical(str(type(err)) + ' ; ' + str(err))
+            logging_handler.critical_error(__name__, err)
+
             return JsonResponse(
                 {
-                    "error": str(err),
+                    "error": "INTERNAL SERVER ERROR",
                     "code": 300-1
                 },
                 status=500
